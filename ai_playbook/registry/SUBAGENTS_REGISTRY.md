@@ -87,15 +87,15 @@
 
 | 状況・トリガー | 使うエージェント | パス |
 |----------------|------------------|------|
-| 新しいタスクを受け取った | `planner` | [subagents/planner.md](../subagents/planner.md) |
-| 要件が曖昧で進めない | `planner` | [subagents/planner.md](../subagents/planner.md) |
-| タスクを分解したい | `planner` | [subagents/planner.md](../subagents/planner.md) |
-| 計画が承認された | `implementer` | [subagents/implementer.md](../subagents/implementer.md) |
-| コードを書きたい | `implementer` | [subagents/implementer.md](../subagents/implementer.md) |
-| バグを修正したい | `implementer` | [subagents/implementer.md](../subagents/implementer.md) |
-| 実装が完了した | `reviewer` | [subagents/reviewer.md](../subagents/reviewer.md) |
-| PRを確認したい | `reviewer` | [subagents/reviewer.md](../subagents/reviewer.md) |
-| マージ前の品質確認 | `reviewer` | [subagents/reviewer.md](../subagents/reviewer.md) |
+| 新しいタスクを受け取った | `planner` | [subagents/planner.md](../subagents/minimal/planner.md) |
+| 要件が曖昧で進めない | `planner` | [subagents/planner.md](../subagents/minimal/planner.md) |
+| タスクを分解したい | `planner` | [subagents/planner.md](../subagents/minimal/planner.md) |
+| 計画が承認された | `implementer` | [subagents/implementer.md](../subagents/minimal/implementer.md) |
+| コードを書きたい | `implementer` | [subagents/implementer.md](../subagents/minimal/implementer.md) |
+| バグを修正したい | `implementer` | [subagents/implementer.md](../subagents/minimal/implementer.md) |
+| 実装が完了した | `reviewer` | [subagents/reviewer.md](../subagents/minimal/reviewer.md) |
+| PRを確認したい | `reviewer` | [subagents/reviewer.md](../subagents/minimal/reviewer.md) |
+| マージ前の品質確認 | `reviewer` | [subagents/reviewer.md](../subagents/minimal/reviewer.md) |
 
 ---
 
@@ -104,7 +104,7 @@
 ### 1. planner（計画立案）
 | 項目 | 内容 |
 |------|------|
-| **パス** | [subagents/planner.md](../subagents/planner.md) |
+| **パス** | [subagents/planner.md](../subagents/minimal/planner.md) |
 | **責務** | タスク分解、前提確認、DoD設計 |
 | **使うスキル** | `phase-planning`, `worklog-update` |
 | **呼ぶとき** | 新タスク受領、要件曖昧、計画見直し |
@@ -122,7 +122,7 @@
 ### 2. implementer（実装）
 | 項目 | 内容 |
 |------|------|
-| **パス** | [subagents/implementer.md](../subagents/implementer.md) |
+| **パス** | [subagents/implementer.md](../subagents/minimal/implementer.md) |
 | **責務** | 最小差分で実装、テスト作成、確認手順提示 |
 | **使うスキル** | `bug-investigation`, `worklog-update` |
 | **呼ぶとき** | 計画承認後、コード変更、バグ修正 |
@@ -141,7 +141,7 @@
 ### 3. reviewer（レビュー）
 | 項目 | 内容 |
 |------|------|
-| **パス** | [subagents/reviewer.md](../subagents/reviewer.md) |
+| **パス** | [subagents/reviewer.md](../subagents/minimal/reviewer.md) |
 | **責務** | 品質評価、セキュリティ確認、修正案提示 |
 | **使うスキル** | `code-review`, `worklog-update` |
 | **呼ぶとき** | 実装完了後、PR確認、マージ前 |
