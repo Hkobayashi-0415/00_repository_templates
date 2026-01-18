@@ -1,0 +1,97 @@
+# CLAUDE.md — {{PROJECT_NAME}}
+
+> **🔴 最初に読むこと**: [SKILLS_REGISTRY.md](file:///D:/dev/00_repository_templates/ai_playbook/registry/SKILLS_REGISTRY.md)
+
+---
+
+## SSOT（必読）
+
+```
+D:\dev\00_repository_templates\ai_playbook\registry\SKILLS_REGISTRY.md
+D:\dev\00_repository_templates\ai_playbook\registry\SUBAGENTS_REGISTRY.md
+```
+
+---
+
+## Project
+
+| 項目 | 値 |
+|------|-----|
+| Name | {{PROJECT_NAME}} |
+| Type | {{PROJECT_TYPE: Web App / CLI / Library / API}} |
+| Stack | {{TECH_STACK: Next.js, Python, Go, etc.}} |
+| Status | {{STATUS: Development / Production}} |
+
+---
+
+## Commands
+
+```bash
+# Dev
+{{DEV_COMMAND}}
+
+# Test
+{{TEST_COMMAND}}
+
+# Build
+{{BUILD_COMMAND}}
+```
+
+---
+
+## Structure
+
+```
+{{PROJECT_STRUCTURE}}
+# 例:
+# src/
+#   components/
+#   pages/
+#   lib/
+# tests/
+# docs/
+```
+
+---
+
+## Skills（よく使うもの）
+
+| Skill | 用途 | パス |
+|-------|------|------|
+| `phase-planning` | 計画立案 | [SKILL.md](file:///D:/dev/00_repository_templates/ai_playbook/skills/phase-planning/SKILL.md) |
+| `bug-investigation` | バグ調査 | [SKILL.md](file:///D:/dev/00_repository_templates/ai_playbook/skills/bug-investigation/SKILL.md) |
+| `code-review` | レビュー | [SKILL.md](file:///D:/dev/00_repository_templates/ai_playbook/skills/code-review/SKILL.md) |
+| `worklog-update` | ログ記録 | [SKILL.md](file:///D:/dev/00_repository_templates/ai_playbook/skills/worklog-update/SKILL.md) |
+
+---
+
+## Agents
+
+| Agent | 役割 |
+|-------|------|
+| `@planner` | タスク分解・DoD設計 |
+| `@implementer` | 最小差分で実装 |
+| `@reviewer` | 品質・セキュリティ確認 |
+
+---
+
+## Logs
+
+### 保存先
+```
+D:\Obsidian\Programming\
+```
+
+### 命名規則
+```
+{{PROJECT_SLUG}}_phase{{NO}}_log_{{YYMMDD}}.md
+```
+
+---
+
+## Constraints
+
+- {{CONSTRAINT_1}}
+- {{CONSTRAINT_2}}
+- テストなしマージ禁止
+- 承認なし実行禁止

@@ -1,0 +1,121 @@
+# AGENTS.md — {{PROJECT_NAME}}
+
+> **🔴 最初に読むこと**: [SKILLS_REGISTRY.md](file:///D:/dev/00_repository_templates/ai_playbook/registry/SKILLS_REGISTRY.md)
+
+---
+
+## 0. SSOT Reference（必読）
+
+作業開始前に、必ず以下のレジストリを読み込むこと：
+
+```
+D:\dev\00_repository_templates\ai_playbook\registry\
+├── SKILLS_REGISTRY.md    ← スキル選定ルール
+└── SUBAGENTS_REGISTRY.md ← エージェント選定ルール
+```
+
+---
+
+## 1. Project Identity
+
+| 項目 | 値 |
+|------|-----|
+| **PJ名** | {{PROJECT_NAME}} |
+| **リポジトリ** | {{REPOSITORY_PATH}} |
+| **ステータス** | {{STATUS: Development / Staging / Production}} |
+
+### 確認コマンド
+```bash
+git rev-parse --show-toplevel
+git remote -v
+git status
+```
+
+---
+
+## 2. Workflow: Plan → Approve → Execute
+
+### 2.1 Plan（必ず最初）
+実装・変更の前に計画を提示：
+- [ ] 目的・スコープ
+- [ ] 変更対象ファイル
+- [ ] テスト計画
+- [ ] ロールバック手順
+
+### 2.2 Approve（停止条件）
+以下が返されるまで実行しない：
+- `APPROVE` / `GO` / `実行して`
+
+### 2.3 Execute（小さく刻む）
+- 1変更 = 1コミット単位
+- 各ステップでテスト実行
+- worklog に記録
+
+---
+
+## 3. 主要コマンド
+
+```bash
+# 開発サーバー
+{{DEV_COMMAND: npm run dev}}
+
+# テスト
+{{TEST_COMMAND: npm test}}
+
+# ビルド
+{{BUILD_COMMAND: npm run build}}
+
+# Lint
+{{LINT_COMMAND: npm run lint}}
+```
+
+---
+
+## 4. 禁止事項
+
+- ❌ {{PROHIBITION_1: 本番DBへの直接接続}}
+- ❌ {{PROHIBITION_2: .envファイルのコミット}}
+- ❌ {{PROHIBITION_3: mainブランチへの直接push}}
+- ❌ 承認なしでの破壊的変更
+- ❌ テストなしでのマージ
+
+---
+
+## 5. ログ方針
+
+### Obsidianログ保存先
+```
+D:\Obsidian\Programming\
+```
+
+### 命名規則
+```
+{{PROJECT_SLUG}}_phase{{PHASE_NO}}_log_{{YYMMDD}}.md
+```
+
+### 例
+```
+washu_phase2_log_260117.md
+```
+
+### 記録タイミング
+- タスク完了時
+- 日次作業終了時
+- 重要な判断時
+- ブロッカー発生時
+
+---
+
+## 6. Dependencies / Install
+
+- 依存追加は事前承認
+- グローバルインストール禁止（repo内管理）
+- `package.json` / `requirements.txt` で管理
+
+---
+
+## 7. 参照
+
+- [SKILLS_REGISTRY](file:///D:/dev/00_repository_templates/ai_playbook/registry/SKILLS_REGISTRY.md)
+- [SUBAGENTS_REGISTRY](file:///D:/dev/00_repository_templates/ai_playbook/registry/SUBAGENTS_REGISTRY.md)
+- [worklog-update SKILL](file:///D:/dev/00_repository_templates/ai_playbook/skills/worklog-update/SKILL.md)
