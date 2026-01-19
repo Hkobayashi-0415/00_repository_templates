@@ -1,0 +1,20 @@
+# AI Playbook Metadata
+# このファイルはSSOTのバージョン管理に使用
+
+version: "0.4.0"
+name: "AI Playbook"
+description: "Skills / Sub-agents を Codex / Claude Code / Antigravity で共通運用するための SSOT"
+
+# 更新履歴
+changelog:
+  - version: "0.2.0"
+    date: "2026-01-19"
+    changes:
+      - "compiled固定方式を導入"
+      - "extended モード追加（5エージェント）"
+      - "build.lock.yaml による版数管理"
+  - version: "0.1.0"
+    date: "2026-01-18"
+    changes:
+      - "初版リリース"
+      - "minimal モード（3エージェント）"

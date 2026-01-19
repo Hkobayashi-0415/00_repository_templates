@@ -1,0 +1,96 @@
+# AI Playbook Registry
+# スキル/エージェントの台帳（SSOT）
+
+skills:
+  - id: phase-planning
+    path: skills/phase-planning/SKILL.md
+    version: "1.0.0"
+    tags:
+      - level/core
+      - role/planning
+      - domain/project-management
+      - target/all
+    description: "フェーズ計画・タスク分解"
+
+  - id: bug-investigation
+    path: skills/bug-investigation/SKILL.md
+    version: "1.0.0"
+    tags:
+      - level/core
+      - role/debugging
+      - domain/engineering
+      - target/all
+    description: "バグ調査・根本原因分析"
+
+  - id: code-review
+    path: skills/code-review/SKILL.md
+    version: "1.0.0"
+    tags:
+      - level/core
+      - role/review
+      - domain/engineering
+      - target/all
+    description: "コードレビュー・品質評価"
+
+  - id: worklog-update
+    path: skills/worklog-update/SKILL.md
+    version: "1.0.0"
+    tags:
+      - level/core
+      - role/logging
+      - domain/project-management
+      - target/all
+    description: "作業ログ更新・進捗記録"
+
+subagents:
+  minimal:
+    - id: planner
+      path: subagents/minimal/planner.md
+      version: "1.0.0"
+      tags:
+        - level/minimal
+        - role/planning
+        - domain/project-management
+        - target/claude
+      description: "計画立案・タスク分解"
+
+    - id: implementer
+      path: subagents/minimal/implementer.md
+      version: "1.0.0"
+      tags:
+        - level/minimal
+        - role/implementation
+        - domain/engineering
+        - target/claude
+      description: "実装・コード変更"
+
+    - id: reviewer
+      path: subagents/minimal/reviewer.md
+      version: "1.0.0"
+      tags:
+        - level/minimal
+        - role/review
+        - domain/engineering
+        - target/claude
+      description: "コードレビュー・品質確認"
+
+  extended:
+    - id: rapid-prototyper
+      path: subagents/extended/rapid-prototyper.md
+      version: "1.0.0"
+      tags:
+        - level/extended
+        - role/prototyping
+        - domain/engineering
+        - target/claude
+      description: "MVP/PoC高速プロトタイピング"
+
+    - id: test-writer-fixer
+      path: subagents/extended/test-writer-fixer.md
+      version: "1.0.0"
+      tags:
+        - level/extended
+        - role/testing
+        - domain/engineering
+        - target/claude
+      description: "テスト追加・修正専任"

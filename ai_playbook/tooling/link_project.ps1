@@ -8,6 +8,7 @@
     .\link_project.ps1 -ProjectPath "D:\dev\my_project"
     .\link_project.ps1 -ProjectPath "D:\dev\my_project" -WhatIf
     .\link_project.ps1 -ProjectPath "D:\dev\my_project" -IncludeReadme
+    .\link_project.ps1 -ProjectPath "D:\dev\my_project" -UseCopy
 #>
 
 [CmdletBinding(SupportsShouldProcess)]
@@ -15,59 +16,27 @@ param(
     [Parameter(Mandatory = $true)]
     [string]$ProjectPath,
     
-    [switch]$IncludeReadme
+    [switch]$IncludeReadme,
+    
+    [switch]$UseCopy
 )
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
+# Load common module
+. (Join-Path $PSScriptRoot "Common.ps1")
+
 #region Load Config
-$script:ConfigPath = Join-Path $PSScriptRoot "config.psd1"
-if (-not (Test-Path $script:ConfigPath)) {
-    Write-Error "config.psd1 not found: $script:ConfigPath"
+try {
+    $script:Config = Import-PlaybookConfig -ScriptRoot $PSScriptRoot
+} catch {
+    Write-Host "[ERROR] Failed to load config: $_" -ForegroundColor Red
     exit 1
 }
-$script:Config = Import-PowerShellDataFile -Path $script:ConfigPath
-$script:SSOT_SKILLS = Join-Path $script:Config.SSOTBase "skills"
+
+$script:SSOT_SKILLS = $script:Config.SSOTSkills
 $script:REGISTRY_PATH = Join-Path $script:Config.SSOTBase "registry"
-#endregion
-
-#region Functions
-function Write-Step {
-    param([string]$Message)
-    Write-Host "[LINK] " -ForegroundColor Cyan -NoNewline
-    Write-Host $Message
-}
-
-function Write-Success {
-    param([string]$Message)
-    Write-Host "[OK] " -ForegroundColor Green -NoNewline
-    Write-Host $Message
-}
-
-function Write-Failure {
-    param([string]$Message)
-    Write-Host "[ERROR] " -ForegroundColor Red -NoNewline
-    Write-Host $Message
-}
-
-function Test-IsJunction {
-    param([string]$Path)
-    if (-not (Test-Path $Path)) { return $false }
-    $item = Get-Item $Path -Force
-    return ($item.Attributes -band [System.IO.FileAttributes]::ReparsePoint) -ne 0
-}
-
-function Remove-ExistingLink {
-    param([string]$Path)
-    if (Test-Path $Path) {
-        if (Test-IsJunction $Path) {
-            cmd /c rmdir "$Path" 2>$null
-        } else {
-            Remove-Item -Path $Path -Recurse -Force
-        }
-    }
-}
 #endregion
 
 #region Main
@@ -80,36 +49,39 @@ function Main {
     
     # Validate project path
     if (-not (Test-Path $ProjectPath)) {
-        Write-Failure "Project path not found: $ProjectPath"
+        Write-NG "Project path not found: $ProjectPath"
         exit 1
     }
     
     $ProjectPath = (Resolve-Path $ProjectPath).Path
-    Write-Step "Project: $ProjectPath"
+    Write-Step "LINK" "Project: $ProjectPath"
     
     # Create .agent directory
     $agentDir = Join-Path $ProjectPath ".agent"
     if (-not (Test-Path $agentDir)) {
         if ($PSCmdlet.ShouldProcess($agentDir, "Create .agent directory")) {
             New-Item -ItemType Directory -Path $agentDir -Force | Out-Null
-            Write-Success "Created .agent/"
+            Write-OK "Created .agent/"
         }
     } else {
-        Write-Success ".agent/ already exists"
+        Write-OK ".agent/ already exists"
     }
     
-    # Create junction: .agent/skills -> SSOT/skills
+    # Create junction/copy: .agent/skills -> SSOT/skills
     $skillsLink = Join-Path $agentDir "skills"
-    Write-Step "Creating skills junction..."
+    Write-Step "LINK" "Creating skills link..."
     
-    if ($PSCmdlet.ShouldProcess($skillsLink, "Create junction to $script:SSOT_SKILLS")) {
-        Remove-ExistingLink -Path $skillsLink
-        cmd /c mklink /J "$skillsLink" "$script:SSOT_SKILLS" | Out-Null
+    if ($PSCmdlet.ShouldProcess($skillsLink, "Create link to $script:SSOT_SKILLS")) {
+        $result = New-JunctionOrCopy -LinkPath $skillsLink -TargetPath $script:SSOT_SKILLS -ForceCopy:$UseCopy
         
-        if (Test-IsJunction $skillsLink) {
-            Write-Success "skills -> $script:SSOT_SKILLS"
+        if ($result.Success) {
+            if ($result.Method -eq "copy") {
+                Write-Warn "skills -> $($result.Message)"
+            } else {
+                Write-OK "skills -> $script:SSOT_SKILLS"
+            }
         } else {
-            Write-Failure "Failed to create junction"
+            Write-NG "Failed: $($result.Message)"
             exit 1
         }
     }
@@ -127,7 +99,7 @@ function Main {
 
 ```
 .agent/
-├── skills/     ← SSOT へのジャンクション
+├── skills/     ← SSOT へのリンク
 └── README.md   ← このファイル
 ```
 
@@ -147,7 +119,7 @@ $script:SSOT_SKILLS
 [START_HERE.md]($script:REGISTRY_PATH\START_HERE.md) を参照してください。
 "@
             Set-Content -Path $readmePath -Value $readmeContent -Encoding UTF8
-            Write-Success "Created README.md"
+            Write-OK "Created README.md"
         }
     }
     

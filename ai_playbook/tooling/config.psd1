@@ -1,11 +1,11 @@
 # AI Playbook Configuration
-# このファイルでSSOTパスと配布設定を一元管理
-# 注意: PSD1ファイルでは変数展開されないため、プレースホルダを使用
+# SSOTパスと配布設定を一元管理
 
 @{
     # SSOT（正本）の絶対パス
-    # 移動時はここだけ変更
-    SSOTBase = 'D:\dev\00_repository_templates\ai_playbook'
+    # '__AUTO__' を指定すると、スクリプト位置から自動解決
+    # 環境変数 $env:AI_PLAYBOOK_HOME があればそれを優先
+    SSOTBase = '__AUTO__'
     
     # 配布先定義（%USERPROFILE%はスクリプトで置換）
     Targets = @{
@@ -28,14 +28,21 @@
         'worklog-update'
     )
     
-    # 期待されるエージェント - Minimal（doctor用）
+    # 期待されるエージェント - Minimal（背骨の3体）
     ExpectedAgentsMinimal = @(
         'planner.md'
         'implementer.md'
         'reviewer.md'
     )
     
+    # 期待されるエージェント - Extended（minimal + 追加2体）
+    ExpectedAgentsExtended = @(
+        'rapid-prototyper.md'
+        'test-writer-fixer.md'
+    )
+    
     # Catalog カテゴリ（doctor用）
+    # catalog モードでは全カテゴリの存在をチェック
     CatalogCategories = @(
         'bonus'
         'design'

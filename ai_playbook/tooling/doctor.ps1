@@ -1,18 +1,19 @@
 <#
 .SYNOPSIS
-    AI Playbook 診断スクリプト
+    AI Playbook 診断スクリプト（compiled固定方式対応）
 .DESCRIPTION
     期待されるパスに必要ファイルが揃っているかチェックし、OK/NGを一覧出力。
-    リンク/コピーの状態を表示し、壊れている場合の修復コマンドを提示。
+    compiled固定、build.lock存在、想定エージェント存在を検証。
 .EXAMPLE
     .\doctor.ps1
+    .\doctor.ps1 -Mode extended
     .\doctor.ps1 -Mode catalog
     .\doctor.ps1 -Fix
 #>
 
 [CmdletBinding()]
 param(
-    [ValidateSet("minimal", "catalog")]
+    [ValidateSet("minimal", "extended", "catalog")]
     [string]$Mode = "minimal",
     
     [switch]$Fix
@@ -21,27 +22,24 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Continue"
 
+# Load common module
+. (Join-Path $PSScriptRoot "Common.ps1")
+
 #region Load Config
-$script:ConfigPath = Join-Path $PSScriptRoot "config.psd1"
-if (-not (Test-Path $script:ConfigPath)) {
-    Write-Error "config.psd1 not found: $script:ConfigPath"
+try {
+    $script:Config = Import-PlaybookConfig -ScriptRoot $PSScriptRoot
+} catch {
+    Write-Host "[ERROR] Failed to load config: $_" -ForegroundColor Red
     exit 1
 }
-$script:Config = Import-PowerShellDataFile -Path $script:ConfigPath
 
 $script:SSOT_BASE = $script:Config.SSOTBase
-$script:SSOT_SKILLS = Join-Path $SSOT_BASE "skills"
-$script:SSOT_AGENTS_MINIMAL = Join-Path $SSOT_BASE "subagents\minimal"
-$script:SSOT_AGENTS_CATALOG = Join-Path $SSOT_BASE "subagents\catalog"
-
-# Expand %USERPROFILE% in target paths
-$script:TARGETS = @{}
-foreach ($key in $script:Config.Targets.Keys) {
-    $script:TARGETS[$key] = $script:Config.Targets[$key] -replace '%USERPROFILE%', $env:USERPROFILE
-}
-
+$script:SSOT_SKILLS = $script:Config.SSOTSkills
+$script:SSOT_AGENTS_CATALOG = $script:Config.SSOTAgentsCatalog
+$script:TARGETS = $script:Config.Targets
 $script:EXPECTED_SKILLS = $script:Config.ExpectedSkills
 $script:EXPECTED_AGENTS_MINIMAL = $script:Config.ExpectedAgentsMinimal
+$script:EXPECTED_AGENTS_EXTENDED = $script:Config.ExpectedAgentsExtended
 $script:CATALOG_CATEGORIES = $script:Config.CatalogCategories
 #endregion
 
@@ -74,32 +72,24 @@ function Write-CheckResult {
     return $OK
 }
 
-function Test-IsJunction {
-    param([string]$Path)
-    if (-not (Test-Path $Path)) { return $false }
-    $item = Get-Item $Path -Force
-    return ($item.Attributes -band [System.IO.FileAttributes]::ReparsePoint) -ne 0
-}
-
 function Get-LinkStatus {
     param([string]$Path)
     if (-not (Test-Path $Path)) {
-        return @{ Status = "missing"; Icon = "❌" }
+        return @{ Status = "missing"; Icon = "❌"; IsJunction = $false }
     } elseif (Test-IsJunction $Path) {
-        # Get junction target
-        $target = (Get-Item $Path).Target
-        return @{ Status = "junction"; Icon = "🔗"; Target = $target }
+        $target = Get-JunctionTarget $Path
+        return @{ Status = "junction"; Icon = "🔗"; Target = $target; IsJunction = $true }
     } else {
-        return @{ Status = "copy"; Icon = "📁" }
+        return @{ Status = "copy"; Icon = "📁"; IsJunction = $false }
     }
 }
 
-function Get-JunctionTarget {
-    param([string]$Path)
-    if (Test-IsJunction $Path) {
-        return (Get-Item $Path -Force).Target
+function Get-ExpectedAgents {
+    switch ($Mode) {
+        "minimal" { return $script:EXPECTED_AGENTS_MINIMAL }
+        "extended" { return $script:EXPECTED_AGENTS_MINIMAL + $script:EXPECTED_AGENTS_EXTENDED }
+        "catalog" { return $script:EXPECTED_AGENTS_MINIMAL + $script:EXPECTED_AGENTS_EXTENDED }
     }
-    return $null
 }
 #endregion
 
@@ -130,20 +120,37 @@ function Main {
         $skillPath = Join-Path $script:SSOT_SKILLS "$skill\SKILL.md"
         $totalChecks++
         $ok = Test-Path $skillPath
-        if (Write-CheckResult "  $skill/SKILL.md" $ok) { $passedChecks++ } else { $issues += "SSOT: $skill missing" }
+        if (Write-CheckResult "  $skill/SKILL.md" $ok) { $passedChecks++ } else { $issues += "SSOT: $skill/SKILL.md missing" }
     }
     
-    # Check minimal agents
+    # Check minimal agents source
     Write-Host ""
+    $minimalSource = Join-Path $script:SSOT_BASE "subagents\minimal"
     $totalChecks++
-    $ok = Test-Path $script:SSOT_AGENTS_MINIMAL
-    if (Write-CheckResult "subagents/minimal/" $ok) { $passedChecks++ } else { $issues += "SSOT: minimal/ missing" }
+    $ok = Test-Path $minimalSource
+    if (Write-CheckResult "subagents/minimal/" $ok) { $passedChecks++ } else { $issues += "SSOT: subagents/minimal/ missing" }
     
     foreach ($agent in $script:EXPECTED_AGENTS_MINIMAL) {
-        $agentPath = Join-Path $script:SSOT_AGENTS_MINIMAL $agent
+        $agentPath = Join-Path $minimalSource $agent
         $totalChecks++
         $ok = Test-Path $agentPath
-        if (Write-CheckResult "  $agent" $ok) { $passedChecks++ } else { $issues += "SSOT: $agent missing" }
+        if (Write-CheckResult "  $agent" $ok) { $passedChecks++ } else { $issues += "SSOT: minimal/$agent missing" }
+    }
+    
+    # Check extended agents source if mode includes extended
+    if ($Mode -in @("extended", "catalog")) {
+        Write-Host ""
+        $extendedSource = Join-Path $script:SSOT_BASE "subagents\extended"
+        $totalChecks++
+        $ok = Test-Path $extendedSource
+        if (Write-CheckResult "subagents/extended/" $ok) { $passedChecks++ } else { $issues += "SSOT: subagents/extended/ missing" }
+        
+        foreach ($agent in $script:EXPECTED_AGENTS_EXTENDED) {
+            $agentPath = Join-Path $extendedSource $agent
+            $totalChecks++
+            $ok = Test-Path $agentPath
+            if (Write-CheckResult "  $agent" $ok) { $passedChecks++ } else { $issues += "SSOT: extended/$agent missing" }
+        }
     }
     
     # Check catalog if mode is catalog
@@ -151,13 +158,58 @@ function Main {
         Write-Host ""
         $totalChecks++
         $ok = Test-Path $script:SSOT_AGENTS_CATALOG
-        if (Write-CheckResult "subagents/catalog/" $ok) { $passedChecks++ } else { $issues += "SSOT: catalog/ missing" }
+        if (Write-CheckResult "subagents/catalog/" $ok) { $passedChecks++ } else { $issues += "SSOT: subagents/catalog/ missing" }
         
         foreach ($category in $script:CATALOG_CATEGORIES) {
             $catPath = Join-Path $script:SSOT_AGENTS_CATALOG $category
             $totalChecks++
             $ok = Test-Path $catPath
             if (Write-CheckResult "  $category/" $ok) { $passedChecks++ } else { $issues += "SSOT: catalog/$category missing" }
+        }
+    }
+    #endregion
+    
+    #region Compiled Checks
+    Write-Host ""
+    Write-Host "Compiled (Build Output)" -ForegroundColor Yellow
+    
+    $compiledAgents = Get-CompiledAgentsPath -SSOTBase $script:SSOT_BASE
+    $buildLock = Get-BuildLockInfo -SSOTBase $script:SSOT_BASE
+    
+    Write-Host "  Path: $compiledAgents" -ForegroundColor Gray
+    Write-Host ""
+    
+    # Check compiled directory exists
+    $totalChecks++
+    $ok = Test-Path $compiledAgents
+    if (Write-CheckResult "_compiled/claude/agents/" $ok) { 
+        $passedChecks++ 
+    } else { 
+        $issues += "Compiled: _compiled/claude/agents/ missing (run install.ps1)" 
+    }
+    
+    # Check build.lock.yaml
+    $totalChecks++
+    if ($buildLock -and $buildLock.Exists) {
+        $lockDetail = "v$($buildLock.PlaybookVersion), mode=$($buildLock.Mode)"
+        if (Write-CheckResult "build.lock.yaml" $true $lockDetail) { $passedChecks++ }
+    } else {
+        if (-not (Write-CheckResult "build.lock.yaml" $false "missing")) {
+            $issues += "Compiled: build.lock.yaml missing"
+        }
+    }
+    
+    # Check expected agents in compiled
+    $expectedAgents = Get-ExpectedAgents
+    Write-Host "  Expected agents ($($expectedAgents.Count)):" -ForegroundColor Gray
+    foreach ($agent in $expectedAgents) {
+        $agentPath = Join-Path $compiledAgents $agent
+        $totalChecks++
+        $check = Test-AgentContent -AgentPath $agentPath
+        if (Write-CheckResult "    $agent" $check.OK $check.Reason) {
+            $passedChecks++
+        } else {
+            $issues += "Compiled: $agent missing or empty"
         }
     }
     #endregion
@@ -184,18 +236,24 @@ function Main {
             }
             if (Write-CheckResult "    Exists" $true $detail) { $passedChecks++ }
             
-            # Verify junction target points to correct SSOT
-            if ($linkInfo.Status -eq "junction" -and $linkInfo.Target) {
+            # Check junction targets
+            if ($linkInfo.IsJunction -and $linkInfo.Target) {
                 $expectedTarget = switch -Wildcard ($key) {
                     "*Skills*" { $script:SSOT_SKILLS }
-                    "*Agents*" { $script:SSOT_AGENTS_MINIMAL }
+                    "*Agents*" { $compiledAgents }  # Must point to compiled
                 }
                 $totalChecks++
                 $targetOk = $linkInfo.Target -eq $expectedTarget
-                if (Write-CheckResult "    Target correct" $targetOk) { $passedChecks++ } else { $issues += "${key}: junction target mismatch" }
+                if (Write-CheckResult "    Target correct" $targetOk) { 
+                    $passedChecks++ 
+                } else { 
+                    $issues += "${key}: junction target mismatch (expected: $expectedTarget)" 
+                }
             }
         } else {
-            if (-not (Write-CheckResult "    Exists" $false "missing")) { $issues += "${key}: missing" }
+            if (-not (Write-CheckResult "    Exists" $false "missing")) { 
+                $issues += "${key}: missing" 
+            }
         }
         Write-Host ""
     }
@@ -220,9 +278,19 @@ function Main {
     }
     #endregion
     
-    #region Registry Check
-    Write-Host "Registry Integrity" -ForegroundColor Yellow
+    #region Meta & Registry Check
+    Write-Host "Meta & Registry" -ForegroundColor Yellow
     Write-Host ""
+    
+    $metaPath = Join-Path $script:SSOT_BASE "meta"
+    $metaFiles = @("playbook.yaml", "registry.yaml")
+    
+    foreach ($file in $metaFiles) {
+        $filePath = Join-Path $metaPath $file
+        $totalChecks++
+        $ok = Test-Path $filePath
+        if (Write-CheckResult "  meta/$file" $ok) { $passedChecks++ } else { $issues += "Meta: $file missing" }
+    }
     
     $registryPath = Join-Path $script:SSOT_BASE "registry"
     $registryFiles = @("SKILLS_REGISTRY.md", "SUBAGENTS_REGISTRY.md", "START_HERE.md")
@@ -231,7 +299,7 @@ function Main {
         $filePath = Join-Path $registryPath $file
         $totalChecks++
         $ok = Test-Path $filePath
-        if (Write-CheckResult "  $file" $ok) { $passedChecks++ } else { $issues += "Registry: $file missing" }
+        if (Write-CheckResult "  registry/$file" $ok) { $passedChecks++ } else { $issues += "Registry: $file missing" }
     }
     #endregion
     
@@ -241,6 +309,12 @@ function Main {
     Write-Host "  Summary" -ForegroundColor $(if ($passedChecks -eq $totalChecks) { "Green" } else { "Yellow" })
     Write-Host "========================================" -ForegroundColor $(if ($passedChecks -eq $totalChecks) { "Green" } else { "Yellow" })
     Write-Host ""
+    
+    # Show playbook version
+    if ($buildLock -and $buildLock.PlaybookVersion) {
+        Write-Host "  Playbook: v$($buildLock.PlaybookVersion)" -ForegroundColor Cyan
+    }
+    
     Write-Host "  Total:  $totalChecks checks"
     Write-Host "  Passed: " -NoNewline
     Write-Host "$passedChecks" -ForegroundColor Green

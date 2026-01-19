@@ -1,51 +1,105 @@
 # 🔴 START HERE — 最初に読むこと
 
 > **このファイルは AI Playbook の入口です。**
-> スキル・サブエージェントを使う前に、必ずこのドキュメントを確認してください。
+> Skills / Sub-agents を Codex / Claude Code / Antigravity で共通運用するための SSOT です。
 
 ---
 
-## SSOT（正本）
+## クイックスタート（3ステップ）
 
-```
-D:\dev\00_repository_templates\ai_playbook\
-├── skills/          ← スキル正本
-├── subagents/
-│   ├── minimal/     ← 必須3エージェント
-│   └── catalog/     ← 拡張37エージェント
-├── registry/        ← 選定ルール
-└── tooling/         ← インストール・診断ツール
-```
-
----
-
-## クイックスタート
-
-### 1. インストール
 ```powershell
-cd D:\dev\00_repository_templates\ai_playbook\tooling
-.\install.ps1
-```
+cd <repo>/ai_playbook/tooling
 
-### 2. 診断
-```powershell
-.\doctor.ps1
-```
+# Step 1: インストール
+.\install.ps1 -Mode minimal   # 背骨の3体のみ（推奨）
+.\install.ps1 -Mode extended  # 3体 + 追加2体（計5体）
+.\install.ps1 -Mode catalog   # 全カテゴリ（上級者向け）
 
-### 3. PJにAntigravity用リンクを作成
-```powershell
+# Step 2: 診断
+.\doctor.ps1 -Mode minimal    # または extended / catalog
+
+# Step 3: Antigravity用PJリンク（任意）
 .\link_project.ps1 -ProjectPath "D:\dev\your_project"
 ```
 
 ---
 
+## モード一覧
+
+| モード | エージェント数 | 用途 |
+|--------|----------------|------|
+| **minimal** | 3体 | 背骨（planner/implementer/reviewer） |
+| **extended** | 5体 | minimal + 追加2体（rapid-prototyper/test-writer-fixer） |
+| **catalog** | 37体+ | 全カテゴリ（default OFF、任意導入） |
+
+---
+
 ## 迷ったら
 
-| 状況 | 使うもの |
-|------|----------|
-| 何をすべきかわからない | `@planner` |
+| 状況 | 使うエージェント |
+|------|------------------|
+| 何をすべきかわからない | `@planner` ← **デフォルト** |
 | 実装したい | `@implementer` |
 | レビューしたい | `@reviewer` |
+| MVP/PoCを素早く作りたい | `@rapid-prototyper`（extended） |
+| テストを追加・修正したい | `@test-writer-fixer`（extended） |
+
+---
+
+## 構造
+
+```
+ai_playbook/                      ← SSOT（正本）
+├── skills/                       ← 4スキル
+├── subagents/
+│   ├── minimal/                  ← 背骨3体
+│   │   ├── planner.md
+│   │   ├── implementer.md
+│   │   └── reviewer.md
+│   ├── extended/                 ← 追加2体
+│   │   ├── rapid-prototyper.md
+│   │   └── test-writer-fixer.md
+│   └── catalog/                  ← 全カテゴリ（37体+）
+├── registry/
+│   ├── START_HERE.md             ← このファイル
+│   ├── SKILLS_REGISTRY.md
+│   └── SUBAGENTS_REGISTRY.md
+└── tooling/
+    ├── config.psd1
+    ├── Common.ps1
+    ├── install.ps1
+    ├── update.ps1
+    ├── doctor.ps1
+    └── link_project.ps1
+```
+
+---
+
+## 配布先
+
+| ツール | Skills | Agents |
+|--------|--------|--------|
+| Codex | `~/.codex/skills/` | - |
+| Claude | `~/.claude/skills/` | `~/.claude/agents/` |
+| Antigravity | `<PJ>/.agent/skills/` | - |
+
+---
+
+## ⚠️ 重要: Claude agents は編集禁止
+
+```
+~/.claude/agents/ は compiled を参照しています。
+直接編集しないでください！
+
+編集する場合:
+1. SSOT の subagents/ 配下のソースを編集
+2. .\install.ps1 -Mode <mode> で再ビルド
+```
+
+配布先を直接編集すると:
+- 次回 install で上書きされる
+- 版数管理が破綻する
+- doctor が不整合を検出する
 
 ---
 
@@ -61,11 +115,6 @@ D:\Obsidian\Programming\
 <PJ>_phase<No>_log_<yymmdd>.md
 例: washu_phase2_log_260118.md
 ```
-
-### 記録タイミング
-- タスク完了時
-- 日次作業終了時
-- 重要な判断時
 
 ---
 

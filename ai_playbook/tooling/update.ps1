@@ -1,73 +1,40 @@
 <#
 .SYNOPSIS
-    AI Playbook アップデートスクリプト
+    AI Playbook アップデートスクリプト（compiled再生成）
 .DESCRIPTION
-    junction時: リンク先がSSOTなので更新不要（常に最新）
-    copy時: 差分同期を実行
+    compiledを再生成し、配布先を更新。
+    junction時はリンク先がSSOT compiledなので更新不要。
+    copy時は再生成してコピー。
 .EXAMPLE
     .\update.ps1
+    .\update.ps1 -Mode extended
     .\update.ps1 -Force
 #>
 
 [CmdletBinding(SupportsShouldProcess)]
 param(
+    [ValidateSet("minimal", "extended", "catalog")]
+    [string]$Mode = "minimal",
+    
     [switch]$Force
 )
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
+# Load common module
+. (Join-Path $PSScriptRoot "Common.ps1")
+
 #region Load Config
-$script:ConfigPath = Join-Path $PSScriptRoot "config.psd1"
-if (-not (Test-Path $script:ConfigPath)) {
-    Write-Error "config.psd1 not found: $script:ConfigPath"
+try {
+    $script:Config = Import-PlaybookConfig -ScriptRoot $PSScriptRoot
+} catch {
+    Write-Host "[ERROR] Failed to load config: $_" -ForegroundColor Red
     exit 1
 }
-$script:Config = Import-PowerShellDataFile -Path $script:ConfigPath
 
-# Expand %USERPROFILE% in target paths
-$script:TARGETS = @{}
-foreach ($key in $script:Config.Targets.Keys) {
-    $script:TARGETS[$key] = $script:Config.Targets[$key] -replace '%USERPROFILE%', $env:USERPROFILE
-}
-#endregion
-
-#region Functions
-function Write-Step {
-    param([string]$Message)
-    Write-Host "[UPDATE] " -ForegroundColor Cyan -NoNewline
-    Write-Host $Message
-}
-
-function Write-Success {
-    param([string]$Message)
-    Write-Host "[OK] " -ForegroundColor Green -NoNewline
-    Write-Host $Message
-}
-
-function Write-Info {
-    param([string]$Message)
-    Write-Host "[INFO] " -ForegroundColor Yellow -NoNewline
-    Write-Host $Message
-}
-
-function Test-IsJunction {
-    param([string]$Path)
-    if (-not (Test-Path $Path)) { return $false }
-    $item = Get-Item $Path -Force
-    return ($item.Attributes -band [System.IO.FileAttributes]::ReparsePoint) -ne 0
-}
-
-function Get-LinkStatus {
-    param([string]$Path)
-    if (-not (Test-Path $Path)) {
-        return "missing"
-    } elseif (Test-IsJunction $Path) {
-        return "junction"
-    } else {
-        return "copy"
-    }
-}
+$script:SSOT_BASE = $script:Config.SSOTBase
+$script:TARGETS = $script:Config.Targets
 #endregion
 
 #region Main
@@ -75,57 +42,77 @@ function Main {
     Write-Host ""
     Write-Host "========================================" -ForegroundColor Cyan
     Write-Host "  AI Playbook Updater" -ForegroundColor Cyan
+    Write-Host "  Mode: $Mode" -ForegroundColor Cyan
     Write-Host "========================================" -ForegroundColor Cyan
     Write-Host ""
     
+    # Step 1: Rebuild compiled
+    Write-Step "UPDATE" "Rebuilding compiled playbook..."
+    try {
+        $buildResult = Build-CompiledPlaybook -Mode $Mode -SSOTBase $script:SSOT_BASE
+        if (-not $buildResult.Success) {
+            Write-NG "Build failed"
+            exit 1
+        }
+    } catch {
+        Write-NG "Build failed: $_"
+        exit 1
+    }
+    
+    # Step 2: Check targets
+    $compiledAgents = Get-CompiledAgentsPath -SSOTBase $script:SSOT_BASE
     $needsUpdate = @()
     
     foreach ($key in $script:TARGETS.Keys) {
         $path = $script:TARGETS[$key]
-        $status = Get-LinkStatus -Path $path
         
-        Write-Step "$key"
+        Write-Step "UPDATE" "$key"
         
-        switch ($status) {
-            "junction" {
-                Write-Success "Junction - 常にSSOTと同期済み（更新不要）"
-            }
-            "copy" {
-                if ($Force) {
-                    Write-Info "Copy - 強制更新対象"
-                    $needsUpdate += @{ Key = $key; Path = $path }
+        if (-not (Test-Path $path)) {
+            Write-Warn "Missing - run install.ps1 first"
+            $needsUpdate += $key
+            continue
+        }
+        
+        if (Test-IsJunction $path) {
+            $target = Get-JunctionTarget $path
+            if ($key -like "*Agents*") {
+                if ($target -eq $compiledAgents) {
+                    Write-OK "Junction -> compiled (auto-updated)"
                 } else {
-                    Write-Info "Copy - 更新が必要な場合は -Force を使用"
+                    Write-Warn "Junction points to wrong target: $target"
+                    $needsUpdate += $key
                 }
+            } else {
+                Write-OK "Junction - always in sync with SSOT"
             }
-            "missing" {
-                Write-Info "Missing - install.ps1 を実行してください"
+        } else {
+            if ($Force) {
+                Write-Warn "Copy - will re-sync from SSOT"
+                $needsUpdate += $key
+            } else {
+                Write-Warn "Copy - use -Force to re-sync from SSOT"
             }
         }
     }
     
     if ($needsUpdate.Count -gt 0 -and $Force) {
         Write-Host ""
-        Write-Step "Forcing update..."
+        Write-Step "UPDATE" "Re-installing to sync..."
         
-        # Re-run install for copy targets
         $installScript = Join-Path $PSScriptRoot "install.ps1"
         if (Test-Path $installScript) {
-            & $installScript -UseCopy
+            & $installScript -Mode $Mode -UseCopy
         }
     }
     
     Write-Host ""
     Write-Host "========================================" -ForegroundColor Green
-    Write-Host "  Update Check Complete" -ForegroundColor Green
+    Write-Host "  Update Complete" -ForegroundColor Green
+    Write-Host "  Playbook Version: $($buildResult.Version)" -ForegroundColor Green
     Write-Host "========================================" -ForegroundColor Green
     Write-Host ""
     
-    if ($needsUpdate.Count -eq 0) {
-        Write-Host "All targets are junctions - always in sync with SSOT." -ForegroundColor Green
-    }
-    
-    Write-Host ""
     exit 0
 }
 
