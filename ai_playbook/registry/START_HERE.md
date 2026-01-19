@@ -87,19 +87,22 @@ ai_playbook/                      ← SSOT（正本）
 
 ## ⚠️ 重要: Claude agents は編集禁止
 
-```
-~/.claude/agents/ は compiled を参照しています。
-直接編集しないでください！
+`~/.claude/agents/` は `_compiled` を参照。直接編集禁止！
+- 編集対象: `subagents/minimal/` または `subagents/extended/`
 
-編集する場合:
-1. SSOT の subagents/ 配下のソースを編集
-2. .\install.ps1 -Mode <mode> で再ビルド
-```
+---
 
-配布先を直接編集すると:
-- 次回 install で上書きされる
-- 版数管理が破綻する
-- doctor が不整合を検出する
+## 更新・復旧手順
+
+```powershell
+# 更新: source編集後
+.\update.ps1 -Mode extended
+.\doctor.ps1 -Mode extended
+
+# 復旧: おかしくなったら
+.\install.ps1 -Mode extended
+.\doctor.ps1 -Mode extended
+```
 
 ---
 

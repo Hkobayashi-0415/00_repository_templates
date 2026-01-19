@@ -4,10 +4,10 @@
 .DESCRIPTION
     期待されるパスに必要ファイルが揃っているかチェックし、OK/NGを一覧出力。
     compiled固定、build.lock存在、想定エージェント存在を検証。
+    lock情報（generated_at/version/hash）とjunction/copy状態を明示表示。
 .EXAMPLE
     .\doctor.ps1
     .\doctor.ps1 -Mode extended
-    .\doctor.ps1 -Mode catalog
     .\doctor.ps1 -Fix
 #>
 
@@ -105,6 +105,7 @@ function Main {
     $totalChecks = 0
     $passedChecks = 0
     $issues = @()
+    $agentsLinkType = "unknown"
     
     #region SSOT Checks
     Write-Host "SSOT (Source of Truth)" -ForegroundColor Yellow
@@ -185,21 +186,37 @@ function Main {
     if (Write-CheckResult "_compiled/claude/agents/" $ok) { 
         $passedChecks++ 
     } else { 
-        $issues += "Compiled: _compiled/claude/agents/ missing (run install.ps1)" 
+        $issues += "Compiled: _compiled/claude/agents/ missing - run install.ps1 -Mode $Mode" 
     }
     
-    # Check build.lock.yaml
+    # Check build.lock.yaml with detailed info
     $totalChecks++
     if ($buildLock -and $buildLock.Exists) {
-        $lockDetail = "v$($buildLock.PlaybookVersion), mode=$($buildLock.Mode)"
-        if (Write-CheckResult "build.lock.yaml" $true $lockDetail) { $passedChecks++ }
+        if (Write-CheckResult "build.lock.yaml" $true "exists") { $passedChecks++ }
+        
+        # Display lock details
+        Write-Host ""
+        Write-Host "  Build Lock Info:" -ForegroundColor Gray
+        if ($buildLock.PlaybookVersion) {
+            Write-Host "    playbook_version: " -NoNewline -ForegroundColor Gray
+            Write-Host "v$($buildLock.PlaybookVersion)" -ForegroundColor Cyan
+        }
+        if ($buildLock.Mode) {
+            Write-Host "    mode:             " -NoNewline -ForegroundColor Gray
+            Write-Host "$($buildLock.Mode)" -ForegroundColor Cyan
+        }
+        if ($buildLock.GeneratedAt) {
+            Write-Host "    generated_at:     " -NoNewline -ForegroundColor Gray
+            Write-Host "$($buildLock.GeneratedAt)" -ForegroundColor Cyan
+        }
     } else {
-        if (-not (Write-CheckResult "build.lock.yaml" $false "missing")) {
-            $issues += "Compiled: build.lock.yaml missing"
+        if (-not (Write-CheckResult "build.lock.yaml" $false "missing - run install.ps1")) {
+            $issues += "Compiled: build.lock.yaml missing - run install.ps1 -Mode $Mode"
         }
     }
     
     # Check expected agents in compiled
+    Write-Host ""
     $expectedAgents = Get-ExpectedAgents
     Write-Host "  Expected agents ($($expectedAgents.Count)):" -ForegroundColor Gray
     foreach ($agent in $expectedAgents) {
@@ -209,7 +226,7 @@ function Main {
         if (Write-CheckResult "    $agent" $check.OK $check.Reason) {
             $passedChecks++
         } else {
-            $issues += "Compiled: $agent missing or empty"
+            $issues += "Compiled: $agent - $($check.Reason)"
         }
     }
     #endregion
@@ -236,6 +253,11 @@ function Main {
             }
             if (Write-CheckResult "    Exists" $true $detail) { $passedChecks++ }
             
+            # Record agents link type for summary
+            if ($key -like "*Agents*") {
+                $agentsLinkType = $linkInfo.Status
+            }
+            
             # Check junction targets
             if ($linkInfo.IsJunction -and $linkInfo.Target) {
                 $expectedTarget = switch -Wildcard ($key) {
@@ -247,12 +269,12 @@ function Main {
                 if (Write-CheckResult "    Target correct" $targetOk) { 
                     $passedChecks++ 
                 } else { 
-                    $issues += "${key}: junction target mismatch (expected: $expectedTarget)" 
+                    $issues += "${key}: junction target mismatch - expected: $expectedTarget, got: $($linkInfo.Target)" 
                 }
             }
         } else {
-            if (-not (Write-CheckResult "    Exists" $false "missing")) { 
-                $issues += "${key}: missing" 
+            if (-not (Write-CheckResult "    Exists" $false "missing - run install.ps1")) { 
+                $issues += "${key}: missing - run install.ps1 -Mode $Mode" 
             }
         }
         Write-Host ""
@@ -310,10 +332,12 @@ function Main {
     Write-Host "========================================" -ForegroundColor $(if ($passedChecks -eq $totalChecks) { "Green" } else { "Yellow" })
     Write-Host ""
     
-    # Show playbook version
+    # Show key info
     if ($buildLock -and $buildLock.PlaybookVersion) {
-        Write-Host "  Playbook: v$($buildLock.PlaybookVersion)" -ForegroundColor Cyan
+        Write-Host "  playbook_version: v$($buildLock.PlaybookVersion)" -ForegroundColor Cyan
     }
+    Write-Host "  agents_link:      $agentsLinkType" -ForegroundColor $(if ($agentsLinkType -eq "junction") { "Green" } elseif ($agentsLinkType -eq "copy") { "Yellow" } else { "Red" })
+    Write-Host ""
     
     Write-Host "  Total:  $totalChecks checks"
     Write-Host "  Passed: " -NoNewline
@@ -330,8 +354,9 @@ function Main {
             Write-Host "    - $issue" -ForegroundColor Red
         }
         Write-Host ""
-        Write-Host "  Repair command:" -ForegroundColor Yellow
-        Write-Host "    .\install.ps1 -Mode $Mode" -ForegroundColor Cyan
+        Write-Host "  Repair commands:" -ForegroundColor Yellow
+        Write-Host "    .\update.ps1 -Mode $Mode  # Try update first" -ForegroundColor Cyan
+        Write-Host "    .\install.ps1 -Mode $Mode # Full reinstall" -ForegroundColor Cyan
         
         if ($Fix) {
             Write-Host ""
