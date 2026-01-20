@@ -212,6 +212,24 @@ function New-JunctionOrCopy {
 #endregion
 
 #region Content Validation (for copy mode)
+function Test-SkillContent {
+    <#
+    .SYNOPSIS
+        スキルディレクトリの中身を検証
+    #>
+    param(
+        [string]$SkillPath,
+        [string]$SkillName
+    )
+    
+    $skillMd = Join-Path $SkillPath "SKILL.md"
+    if (-not (Test-Path $skillMd)) {
+        return @{ OK = $false; Reason = "SKILL.md not found" }
+    }
+    
+    return @{ OK = $true; Reason = "SKILL.md exists" }
+}
+
 function Test-AgentContent {
     <#
     .SYNOPSIS

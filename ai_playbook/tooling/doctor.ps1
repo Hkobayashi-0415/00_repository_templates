@@ -78,12 +78,12 @@ function Write-CheckResult {
 function Get-LinkStatus {
     param([string]$Path)
     if (-not (Test-Path $Path)) {
-        return @{ Status = "missing"; Icon = "❌"; IsJunction = $false }
+        return @{ Status = "missing"; Icon = "❌"; IsJunction = $false; Target = $null }
     } elseif (Test-IsJunction $Path) {
         $target = Get-JunctionTarget $Path
         return @{ Status = "junction"; Icon = "🔗"; Target = $target; IsJunction = $true }
     } else {
-        return @{ Status = "copy"; Icon = "📁"; IsJunction = $false }
+        return @{ Status = "copy"; Icon = "📁"; IsJunction = $false; Target = $null }
     }
 }
 

@@ -4,7 +4,7 @@
 playbook_version: "0.4.0"
 mode: "extended"
 registry_hash: "7c2d6e8bcdfb5f23b8f4ac10ab32d60def827bca0f912753a66f9b3097e521ae"
-generated_at: "2026-01-20T23:08:51+09:00"
+generated_at: "2026-01-20T22:39:10+09:00"
 
 compiled_agents:
   - name: "implementer.md"

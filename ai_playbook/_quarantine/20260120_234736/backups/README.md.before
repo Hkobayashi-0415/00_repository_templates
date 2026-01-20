@@ -141,47 +141,6 @@ cd 00_repository_templates\ai_playbook\tooling
 .\doctor.ps1 -Mode minimal     # または extended
 ```
 
-### 個人運用（copy前提）取り扱い説明書
-
-個人利用で更新頻度が低い場合は copy 運用で問題ありません。junction は自動で試行されますが、確実に copy にしたい場合は `-UseCopy` を指定します。
-
-#### 設定
-
-- `ai_playbook/tooling/config.psd1` の `SSOTBase` は `__AUTO__` のままで OK（tooling の 1 つ上を SSOT として解決）
-- 別の場所に置く場合は `SSOTBase` を絶対パスにするか、`AI_PLAYBOOK_HOME` を設定
-
-#### 初回導入（copy運用）
-
-```powershell
-cd 00_repository_templates\ai_playbook\tooling
-
-.\install.ps1 -Mode minimal -UseCopy
-.\doctor.ps1 -Mode minimal
-```
-
-extended を使う場合:
-
-```powershell
-.\install.ps1 -Mode extended -UseCopy
-.\doctor.ps1 -Mode extended
-```
-
-#### 日常運用
-
-- 変更が無ければ何もしない
-- 変更した場合は以下を実行
-
-```powershell
-.\update.ps1 -Mode extended
-.\doctor.ps1 -Mode extended
-```
-
-#### doctorの見方（copy運用）
-
-- `agents_link: copy` は正常
-- `registry_hash match` が OK であること
-- NG の場合は `.\update.ps1 -Mode X` → `.\doctor.ps1 -Mode X` の順で復旧
-
 ### モード一覧
 
 | モード | エージェント数 | 用途 |
