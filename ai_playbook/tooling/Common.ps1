@@ -412,6 +412,9 @@ function Get-BuildLockInfo {
     if ($content -match 'mode:\s*"([^"]+)"') {
         $result.Mode = $matches[1]
     }
+    if ($content -match 'registry_hash:\s*"([^"]+)"') {
+        $result.RegistryHash = $matches[1]
+    }
     if ($content -match 'generated_at:\s*"([^"]+)"') {
         $result.GeneratedAt = $matches[1]
     }

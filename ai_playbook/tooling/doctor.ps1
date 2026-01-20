@@ -15,6 +15,9 @@
 param(
     [ValidateSet("minimal", "extended", "catalog")]
     [string]$Mode = "minimal",
+
+    [ValidateSet("fail", "warn", "off")]
+    [string]$RegistryHashPolicy = "fail",
     
     [switch]$Fix
 )
@@ -205,6 +208,10 @@ function Main {
             Write-Host "    mode:             " -NoNewline -ForegroundColor Gray
             Write-Host "$($buildLock.Mode)" -ForegroundColor Cyan
         }
+        if ($buildLock.RegistryHash) {
+            Write-Host "    registry_hash:    " -NoNewline -ForegroundColor Gray
+            Write-Host "$($buildLock.RegistryHash)" -ForegroundColor Cyan
+        }
         if ($buildLock.GeneratedAt) {
             Write-Host "    generated_at:     " -NoNewline -ForegroundColor Gray
             Write-Host "$($buildLock.GeneratedAt)" -ForegroundColor Cyan
@@ -212,6 +219,46 @@ function Main {
     } else {
         if (-not (Write-CheckResult "build.lock.yaml" $false "missing - run install.ps1")) {
             $issues += "Compiled: build.lock.yaml missing - run install.ps1 -Mode $Mode"
+        }
+    }
+
+    # Check registry_hash mismatch to prevent "forgot update.ps1" accidents
+    if ($RegistryHashPolicy -ne "off") {
+        $registryYaml = Join-Path $script:SSOT_BASE "meta\registry.yaml"
+        $currentRegistryHash = Get-FileHash256 -Path $registryYaml
+        $expectedRegistryHash = $buildLock.RegistryHash
+
+        if (-not $expectedRegistryHash) {
+            $totalChecks++
+            if (Write-CheckResult "registry_hash match" $false "missing in build.lock.yaml - run install/update") {
+                $passedChecks++
+            } else {
+                $issues += "Compiled: registry_hash missing in build.lock.yaml"
+            }
+        } elseif (-not $currentRegistryHash) {
+            $totalChecks++
+            if (Write-CheckResult "registry_hash match" $false "meta/registry.yaml not found") {
+                $passedChecks++
+            } else {
+                $issues += "Meta: registry.yaml missing"
+            }
+        } else {
+            $totalChecks++
+            $hashMatches = $currentRegistryHash -eq $expectedRegistryHash
+
+            if ($hashMatches) {
+                if (Write-CheckResult "registry_hash match" $true) { $passedChecks++ }
+            } else {
+                $detail = "mismatch - lock=$expectedRegistryHash current=$currentRegistryHash"
+                if ($RegistryHashPolicy -eq "warn") {
+                    Write-Warn "Registry hash mismatch detected (policy=warn). Run '.\\update.ps1 -Mode $Mode'."
+                    if (Write-CheckResult "registry_hash match" $true "WARN $detail") { $passedChecks++ }
+                } else {
+                    if (-not (Write-CheckResult "registry_hash match" $false $detail)) {
+                        $issues += "Registry hash mismatch - run '.\\update.ps1 -Mode $Mode'"
+                    }
+                }
+            }
         }
     }
     

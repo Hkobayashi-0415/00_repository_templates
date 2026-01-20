@@ -3,8 +3,8 @@
 
 playbook_version: "0.4.0"
 mode: "extended"
-registry_hash: "b52243bd1a8eb966176afcba74b578ae9f96f26878d2f147389d655e39718637"
-generated_at: "2026-01-19T23:22:45+09:00"
+registry_hash: "7c2d6e8bcdfb5f23b8f4ac10ab32d60def827bca0f912753a66f9b3097e521ae"
+generated_at: "2026-01-20T16:48:07+09:00"
 
 compiled_agents:
   - name: "implementer.md"
