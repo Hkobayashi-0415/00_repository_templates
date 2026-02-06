@@ -33,6 +33,10 @@
   - テスト実行（§3）
   - worklog 追記（§6）
 
+## 1.4 Skill Operation (MUST)
+- スキルはタスク内容に応じて選定する（特定スキル名の強制はしない）。
+- 追加スキルが必要になった場合は妥当性を評価して使用し、使用したスキルを記録する。
+
 ## 2) Dependencies / Install policy (A)
 - 依存追加は常に事前承認。
 - ドキュメントに沿った手順を優先する。
@@ -53,4 +57,5 @@
 
 ## 6) Work history (追加要件)
 - 詳細な作業履歴を `docs/worklog/` に残す（経験値ライブラリ化のため）。
-- 記録項目：変更内容、実行コマンド、テスト結果、判断理由、次アクション。
+- 記録項目：変更内容、実行コマンド、テスト結果、判断理由、次アクション、`Execution-Tool`、`Execution-Agent`、`Execution-Model`、`Used-Skills`、`Repo-Refs`、`Obsidian-Refs`、`Tags`。
+- Obsidianログを作成する場合は `D:\Obsidian\Programming\00_repository_templates_obsidian_log_template.md` を使用し、`agent`/`model`/`tool` を必ず含める。
