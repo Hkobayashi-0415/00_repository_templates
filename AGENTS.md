@@ -36,6 +36,22 @@
 ## 1.4 Skill Operation (MUST)
 - スキルはタスク内容に応じて選定する（特定スキル名の強制はしない）。
 - 追加スキルが必要になった場合は妥当性を評価して使用し、使用したスキルを記録する。
+- Skills と Subagents は同時に利用してよい（分離して記録する）。
+
+### Skill選定ガイド
+| タスク種別 | 基本Skill | 補足 |
+|-----------|----------|------|
+| バグ調査・デバッグ・修正 | bug-investigation | 原因不明の動作異常は原則これを選ぶ |
+| フェーズ計画・TDD設計・タスク分解 | phase-planning | phaseX_tdd / kickoff 系は優先 |
+| コードレビュー・結果確認・検証 | code-review | _review / _confirmation / _validation で優先 |
+| ログ記録が主目的 | worklog-update | 他Skillとの併用可。単独利用は最小限 |
+| Git操作のみ（commit/push/branch） | n/a | Skill不要の軽作業として扱う |
+
+### Subagents と Skills の記録ルール
+- `Used-Skills` には Skill 名のみを記録する。
+- `Used-Subagents` には Subagent ロール名のみを記録する。
+- `implementer` / `planner` / `reviewer` / `test-writer-fixer` は Subagent であり Skill ではない。
+- `n/a` は Skill が不要な作業（Git操作のみ、1行修正など）に限定する。
 
 ## 2) Dependencies / Install policy (A)
 - 依存追加は常に事前承認。
@@ -57,5 +73,5 @@
 
 ## 6) Work history (追加要件)
 - 詳細な作業履歴を `docs/worklog/` に残す（経験値ライブラリ化のため）。
-- 記録項目：変更内容、実行コマンド、テスト結果、判断理由、次アクション、`Execution-Tool`、`Execution-Agent`、`Execution-Model`、`Used-Skills`、`Repo-Refs`、`Obsidian-Refs`、`Tags`。
+- 記録項目：変更内容、実行コマンド、テスト結果、判断理由、次アクション、`Execution-Tool`、`Execution-Agent`、`Execution-Model`、`Used-Skills`、`Used-Subagents`、`Repo-Refs`、`Obsidian-Refs`、`Tags`。
 - Obsidianログを作成する場合は `D:\Obsidian\Programming\00_repository_templates_obsidian_log_template.md` を使用し、`agent`/`model`/`tool` を必ず含める。

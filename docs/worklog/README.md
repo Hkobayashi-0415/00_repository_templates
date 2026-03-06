@@ -3,5 +3,6 @@
 - 変更ごとに `docs/worklog/` へログを追加する。
 - ファイル名は `YYYY-MM-DD_<short-title>.md`。
 - 書式は `docs/worklog/_template.md` を使用する。
+- `Used-Skills`（Skill名のみ）と `Used-Subagents`（Subagent名のみ）を分離して記録する。
 - Execution-Tool/Execution-Agent/Execution-Model と Tags を記載する。
 - ルールの正は `AGENTS.md`。このREADMEは手順のみを記載する。
