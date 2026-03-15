@@ -1,0 +1,9 @@
+{
+  "repo": "anthropics/skills",
+  "skill_id": "theme-factory",
+  "name": "theme-factory",
+  "status": "approved",
+  "unresolved": false,
+  "entry_path": "skills/theme-factory/SKILL.md",
+  "findings": []
+}

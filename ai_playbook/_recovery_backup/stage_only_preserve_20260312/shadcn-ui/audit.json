@@ -1,0 +1,42 @@
+{
+  "repo": "google-labs-code/stitch-skills",
+  "skill_id": "shadcn-ui",
+  "name": "shadcn-ui",
+  "status": "review",
+  "unresolved": false,
+  "entry_path": "skills/shadcn-ui/SKILL.md",
+  "findings": [
+    {
+      "severity": "high",
+      "rule_id": "shell-exec",
+      "reason": "シェル実行の記述",
+      "line": 9,
+      "excerpt": "- \"Bash\"",
+      "file": "skills/shadcn-ui/SKILL.md"
+    },
+    {
+      "severity": "high",
+      "rule_id": "shell-exec",
+      "reason": "シェル実行の記述",
+      "line": 39,
+      "excerpt": "```bash",
+      "file": "skills/shadcn-ui/SKILL.md"
+    },
+    {
+      "severity": "high",
+      "rule_id": "shell-exec",
+      "reason": "シェル実行の記述",
+      "line": 69,
+      "excerpt": "```bash",
+      "file": "skills/shadcn-ui/SKILL.md"
+    },
+    {
+      "severity": "high",
+      "rule_id": "shell-exec",
+      "reason": "シェル実行の記述",
+      "line": 75,
+      "excerpt": "```bash",
+      "file": "skills/shadcn-ui/SKILL.md"
+    }
+  ]
+}

@@ -1,0 +1,54 @@
+{
+  "fetched_at": "2026-03-11T07:53:29.149Z",
+  "rank": 111,
+  "name": "design-md",
+  "skill_id": "design-md",
+  "repo": "google-labs-code/stitch-skills",
+  "repo_slug": "google-labs-code__stitch-skills",
+  "installs": 13401,
+  "entry_path": "skills/design-md/SKILL.md",
+  "candidate_paths": [
+    {
+      "filePath": "skills/design-md/SKILL.md",
+      "score": 350
+    },
+    {
+      "filePath": "skills/enhance-prompt/SKILL.md",
+      "score": 40
+    },
+    {
+      "filePath": "skills/react-components/SKILL.md",
+      "score": 40
+    },
+    {
+      "filePath": "skills/remotion/SKILL.md",
+      "score": 40
+    },
+    {
+      "filePath": "skills/shadcn-ui/SKILL.md",
+      "score": 40
+    },
+    {
+      "filePath": "skills/stitch-loop/SKILL.md",
+      "score": 40
+    }
+  ],
+  "referenced_files": [
+    "skills/design-md/SKILL.md"
+  ],
+  "unresolved": false,
+  "sanitized_at": "2026-03-11T09:50:54.1737864Z",
+  "sanitized_root": "D:\\workspace\\KANAKEN\\tools\\skills-staging\\sanitized\\google-labs-code__stitch-skills\\design-md",
+  "rewritten_files": [
+    {
+      "path": "skills/design-md/SKILL.md",
+      "invisible_removed": 0,
+      "control_removed": 0,
+      "flags": [],
+      "overlay_inserted": true
+    }
+  ],
+  "invisible_removed_total": 0,
+  "control_removed_total": 0
+}
+

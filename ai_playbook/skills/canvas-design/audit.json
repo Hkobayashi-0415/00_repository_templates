@@ -1,0 +1,9 @@
+{
+  "repo": "anthropics/skills",
+  "skill_id": "canvas-design",
+  "name": "canvas-design",
+  "status": "approved",
+  "unresolved": false,
+  "entry_path": "skills/canvas-design/SKILL.md",
+  "findings": []
+}

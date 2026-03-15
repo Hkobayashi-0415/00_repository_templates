@@ -1,0 +1,106 @@
+{
+  "repo": "anthropics/skills",
+  "skill_id": "webapp-testing",
+  "name": "webapp-testing",
+  "status": "review",
+  "unresolved": false,
+  "entry_path": "skills/webapp-testing/SKILL.md",
+  "findings": [
+    {
+      "severity": "high",
+      "rule_id": "shell-exec",
+      "reason": "シェル実行の記述",
+      "line": 40,
+      "excerpt": "```bash",
+      "file": "skills/webapp-testing/SKILL.md"
+    },
+    {
+      "severity": "high",
+      "rule_id": "shell-exec",
+      "reason": "シェル実行の記述",
+      "line": 45,
+      "excerpt": "```bash",
+      "file": "skills/webapp-testing/SKILL.md"
+    },
+    {
+      "severity": "high",
+      "rule_id": "child-process",
+      "reason": "外部プロセス実行の記述",
+      "line": 17,
+      "excerpt": "import subprocess",
+      "file": "skills/webapp-testing/scripts/with_server.py"
+    },
+    {
+      "severity": "high",
+      "rule_id": "shell-exec",
+      "reason": "シェル実行の記述",
+      "line": 58,
+      "excerpt": "for cmd, port in zip(args.servers, args.ports):",
+      "file": "skills/webapp-testing/scripts/with_server.py"
+    },
+    {
+      "severity": "high",
+      "rule_id": "shell-exec",
+      "reason": "シェル実行の記述",
+      "line": 59,
+      "excerpt": "servers.append({'cmd': cmd, 'port': port})",
+      "file": "skills/webapp-testing/scripts/with_server.py"
+    },
+    {
+      "severity": "high",
+      "rule_id": "shell-exec",
+      "reason": "シェル実行の記述",
+      "line": 66,
+      "excerpt": "print(f\"Starting server {i+1}/{len(servers)}: {server['cmd']}\")",
+      "file": "skills/webapp-testing/scripts/with_server.py"
+    },
+    {
+      "severity": "high",
+      "rule_id": "child-process",
+      "reason": "外部プロセス実行の記述",
+      "line": 69,
+      "excerpt": "process = subprocess.Popen(",
+      "file": "skills/webapp-testing/scripts/with_server.py"
+    },
+    {
+      "severity": "high",
+      "rule_id": "shell-exec",
+      "reason": "シェル実行の記述",
+      "line": 70,
+      "excerpt": "server['cmd'],",
+      "file": "skills/webapp-testing/scripts/with_server.py"
+    },
+    {
+      "severity": "high",
+      "rule_id": "child-process",
+      "reason": "外部プロセス実行の記述",
+      "line": 72,
+      "excerpt": "stdout=subprocess.PIPE,",
+      "file": "skills/webapp-testing/scripts/with_server.py"
+    },
+    {
+      "severity": "high",
+      "rule_id": "child-process",
+      "reason": "外部プロセス実行の記述",
+      "line": 73,
+      "excerpt": "stderr=subprocess.PIPE",
+      "file": "skills/webapp-testing/scripts/with_server.py"
+    },
+    {
+      "severity": "high",
+      "rule_id": "child-process",
+      "reason": "外部プロセス実行の記述",
+      "line": 88,
+      "excerpt": "result = subprocess.run(args.command)",
+      "file": "skills/webapp-testing/scripts/with_server.py"
+    },
+    {
+      "severity": "high",
+      "rule_id": "child-process",
+      "reason": "外部プロセス実行の記述",
+      "line": 98,
+      "excerpt": "except subprocess.TimeoutExpired:",
+      "file": "skills/webapp-testing/scripts/with_server.py"
+    }
+  ]
+}

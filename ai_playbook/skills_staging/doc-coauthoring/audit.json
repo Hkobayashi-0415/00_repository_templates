@@ -1,0 +1,9 @@
+{
+  "repo": "anthropics/skills",
+  "skill_id": "doc-coauthoring",
+  "name": "doc-coauthoring",
+  "status": "approved",
+  "unresolved": false,
+  "entry_path": "skills/doc-coauthoring/SKILL.md",
+  "findings": []
+}

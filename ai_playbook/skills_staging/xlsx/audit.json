@@ -1,0 +1,154 @@
+{
+  "repo": "anthropics/skills",
+  "skill_id": "xlsx",
+  "name": "xlsx",
+  "status": "review",
+  "unresolved": false,
+  "entry_path": "skills/xlsx/SKILL.md",
+  "findings": [
+    {
+      "severity": "high",
+      "rule_id": "shell-exec",
+      "reason": "シェル実行の記述",
+      "line": 138,
+      "excerpt": "```bash",
+      "file": "skills/xlsx/SKILL.md"
+    },
+    {
+      "severity": "high",
+      "rule_id": "shell-exec",
+      "reason": "シェル実行の記述",
+      "line": 211,
+      "excerpt": "```bash",
+      "file": "skills/xlsx/SKILL.md"
+    },
+    {
+      "severity": "high",
+      "rule_id": "shell-exec",
+      "reason": "シェル実行の記述",
+      "line": 216,
+      "excerpt": "```bash",
+      "file": "skills/xlsx/SKILL.md"
+    },
+    {
+      "severity": "high",
+      "rule_id": "child-process",
+      "reason": "外部プロセス実行の記述",
+      "line": 12,
+      "excerpt": "# Option 2 – get env dict for your own subprocess calls",
+      "file": "skills/xlsx/scripts/office/soffice.py"
+    },
+    {
+      "severity": "high",
+      "rule_id": "child-process",
+      "reason": "外部プロセス実行の記述",
+      "line": 14,
+      "excerpt": "subprocess.run([\"soffice\", ...], env=env)",
+      "file": "skills/xlsx/scripts/office/soffice.py"
+    },
+    {
+      "severity": "high",
+      "rule_id": "child-process",
+      "reason": "外部プロセス実行の記述",
+      "line": 19,
+      "excerpt": "import subprocess",
+      "file": "skills/xlsx/scripts/office/soffice.py"
+    },
+    {
+      "severity": "high",
+      "rule_id": "child-process",
+      "reason": "外部プロセス実行の記述",
+      "line": 35,
+      "excerpt": "def run_soffice(args: list[str], **kwargs) -> subprocess.CompletedProcess:",
+      "file": "skills/xlsx/scripts/office/soffice.py"
+    },
+    {
+      "severity": "high",
+      "rule_id": "child-process",
+      "reason": "外部プロセス実行の記述",
+      "line": 37,
+      "excerpt": "return subprocess.run([\"soffice\"] + args, env=env, **kwargs)",
+      "file": "skills/xlsx/scripts/office/soffice.py"
+    },
+    {
+      "severity": "high",
+      "rule_id": "child-process",
+      "reason": "外部プロセス実行の記述",
+      "line": 59,
+      "excerpt": "subprocess.run(",
+      "file": "skills/xlsx/scripts/office/soffice.py"
+    },
+    {
+      "severity": "high",
+      "rule_id": "child-process",
+      "reason": "外部プロセス実行の記述",
+      "line": 9,
+      "excerpt": "import subprocess",
+      "file": "skills/xlsx/scripts/recalc.py"
+    },
+    {
+      "severity": "high",
+      "rule_id": "child-process",
+      "reason": "外部プロセス実行の記述",
+      "line": 34,
+      "excerpt": "subprocess.run(",
+      "file": "skills/xlsx/scripts/recalc.py"
+    },
+    {
+      "severity": "high",
+      "rule_id": "child-process",
+      "reason": "外部プロセス実行の記述",
+      "line": 38,
+      "excerpt": "except (FileNotFoundError, subprocess.TimeoutExpired):",
+      "file": "skills/xlsx/scripts/recalc.py"
+    },
+    {
+      "severity": "high",
+      "rule_id": "child-process",
+      "reason": "外部プロセス実行の記述",
+      "line": 55,
+      "excerpt": "subprocess.run(",
+      "file": "skills/xlsx/scripts/recalc.py"
+    },
+    {
+      "severity": "high",
+      "rule_id": "shell-exec",
+      "reason": "シェル実行の記述",
+      "line": 79,
+      "excerpt": "cmd = [",
+      "file": "skills/xlsx/scripts/recalc.py"
+    },
+    {
+      "severity": "high",
+      "rule_id": "shell-exec",
+      "reason": "シェル実行の記述",
+      "line": 88,
+      "excerpt": "cmd = [\"timeout\", str(timeout)] + cmd",
+      "file": "skills/xlsx/scripts/recalc.py"
+    },
+    {
+      "severity": "high",
+      "rule_id": "shell-exec",
+      "reason": "シェル実行の記述",
+      "line": 90,
+      "excerpt": "cmd = [\"gtimeout\", str(timeout)] + cmd",
+      "file": "skills/xlsx/scripts/recalc.py"
+    },
+    {
+      "severity": "high",
+      "rule_id": "shell-exec",
+      "reason": "シェル実行の記述",
+      "line": 92,
+      "excerpt": "result = subprocess.run(cmd, capture_output=True, text=True, env=get_soffice_env())",
+      "file": "skills/xlsx/scripts/recalc.py"
+    },
+    {
+      "severity": "high",
+      "rule_id": "child-process",
+      "reason": "外部プロセス実行の記述",
+      "line": 92,
+      "excerpt": "result = subprocess.run(cmd, capture_output=True, text=True, env=get_soffice_env())",
+      "file": "skills/xlsx/scripts/recalc.py"
+    }
+  ]
+}

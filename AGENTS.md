@@ -37,6 +37,8 @@
 - スキルはタスク内容に応じて選定する（特定スキル名の強制はしない）。
 - 追加スキルが必要になった場合は妥当性を評価して使用し、使用したスキルを記録する。
 - Skills と Subagents は同時に利用してよい（分離して記録する）。
+- 新規 Skill を追加・受け入れ・本番登録するタスクでは `skill-registration` を必ず使用する。
+- 新規 Skill 候補はレビュー完了まで `ai_playbook/skills_staging/` に置き、`ai_playbook/skills/` へ直接格納しない。
 
 ### Skill選定ガイド
 | タスク種別 | 基本Skill | 補足 |
@@ -44,6 +46,7 @@
 | バグ調査・デバッグ・修正 | bug-investigation | 原因不明の動作異常は原則これを選ぶ |
 | フェーズ計画・TDD設計・タスク分解 | phase-planning | phaseX_tdd / kickoff 系は優先 |
 | コードレビュー・結果確認・検証 | code-review | _review / _confirmation / _validation で優先 |
+| 新規Skill登録・受け入れ | skill-registration | staging → レビュー → 脅威判定 → 安全化 → 重複判定 → 索引更新 → 本番格納 |
 | ログ記録が主目的 | worklog-update | 他Skillとの併用可。単独利用は最小限 |
 | Git操作のみ（commit/push/branch） | n/a | Skill不要の軽作業として扱う |
 

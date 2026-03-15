@@ -1,0 +1,70 @@
+{
+  "fetched_at": "2026-03-11T07:53:02.58Z",
+  "rank": 85,
+  "name": "canvas-design",
+  "skill_id": "canvas-design",
+  "repo": "anthropics/skills",
+  "repo_slug": "anthropics__skills",
+  "installs": 16750,
+  "entry_path": "skills/canvas-design/SKILL.md",
+  "candidate_paths": [
+    {
+      "filePath": "skills/canvas-design/SKILL.md",
+      "score": 350
+    },
+    {
+      "filePath": "skills/algorithmic-art/SKILL.md",
+      "score": 40
+    },
+    {
+      "filePath": "skills/brand-guidelines/SKILL.md",
+      "score": 40
+    },
+    {
+      "filePath": "skills/claude-api/SKILL.md",
+      "score": 40
+    },
+    {
+      "filePath": "skills/doc-coauthoring/SKILL.md",
+      "score": 40
+    },
+    {
+      "filePath": "skills/docx/SKILL.md",
+      "score": 40
+    },
+    {
+      "filePath": "skills/frontend-design/SKILL.md",
+      "score": 40
+    },
+    {
+      "filePath": "skills/internal-comms/SKILL.md",
+      "score": 40
+    },
+    {
+      "filePath": "skills/mcp-builder/SKILL.md",
+      "score": 40
+    },
+    {
+      "filePath": "skills/pdf/SKILL.md",
+      "score": 40
+    }
+  ],
+  "referenced_files": [
+    "skills/canvas-design/SKILL.md"
+  ],
+  "unresolved": false,
+  "sanitized_at": "2026-03-11T09:50:52.4804440Z",
+  "sanitized_root": "D:\\workspace\\KANAKEN\\tools\\skills-staging\\sanitized\\anthropics__skills\\canvas-design",
+  "rewritten_files": [
+    {
+      "path": "skills/canvas-design/SKILL.md",
+      "invisible_removed": 0,
+      "control_removed": 0,
+      "flags": [],
+      "overlay_inserted": true
+    }
+  ],
+  "invisible_removed_total": 0,
+  "control_removed_total": 0
+}
+
